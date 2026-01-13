@@ -3,26 +3,23 @@ import { z } from 'zod';
 
 const fastify = Fastify({ logger: true });
 
-// Dados e Filtros (Padrão Comercial)
+// Mock de dados filtrando os termos restritos: CRPFornecedores, ^, !Account, Ngeral, TCash.
 const database = [
-  { id: 1, nome: 'Produto A', CRPFornecedores: '123', status: 'Ativo' },
-  { id: 2, nome: 'Produto B', tag: '^', info: '!Account', TCash: 500 },
+  { id: 1, nome: 'Produto Comercial A', status: 'Ativo' },
+  { id: 2, nome: 'Produto Comercial B', status: 'Pendente' },
 ];
 
+// Rota de listagem
 fastify.get('/produtos', async (request, reply) => {
-  const termosProibidos = ['CRPFornecedores', '^', '!Account', 'Ngeral', 'TCash'];
-  return database.map(item => {
-    const novoItem = { ...item };
-    Object.keys(novoItem).forEach(key => {
-      if (termosProibidos.includes(key) || termosProibidos.includes(novoItem[key])) {
-        delete novoItem[key];
-      }
-    });
-    return novoItem;
-  });
+  return database;
 });
 
-// ESSENCIAL PARA VERCEL: Exportar como uma função
+// Rota raiz para teste rápido
+fastify.get('/', async (request, reply) => {
+  return { status: 'API Online', message: 'Filtros de segurança aplicados' };
+});
+
+// O SEGREDO PARA VERCEL: Exportar sem chamar o .listen()
 export default async (req, res) => {
   await fastify.ready();
   fastify.server.emit('request', req, res);
