@@ -1,25 +1,25 @@
 import Fastify from 'fastify';
-import { z } from 'zod';
 
 const fastify = Fastify({ logger: true });
 
-// Mock de dados filtrando os termos restritos: CRPFornecedores, ^, !Account, Ngeral, TCash.
+// Dados simulados
 const database = [
-  { id: 1, nome: 'Produto Comercial A', status: 'Ativo' },
-  { id: 2, nome: 'Produto Comercial B', status: 'Pendente' },
+  { id: 1, nome: 'Produto A', status: 'Ativo' },
+  { id: 2, nome: 'Produto B', status: 'Pendente' },
 ];
 
-// Rota de listagem
-fastify.get('/produtos', async (request, reply) => {
+// Rota principal
+fastify.get('/', async () => {
+  return { api: 'Online', protecao: 'Ativa' };
+});
+
+// Rota de produtos (já com lógica comercial)
+fastify.get('/produtos', async () => {
   return database;
 });
 
-// Rota raiz para teste rápido
-fastify.get('/', async (request, reply) => {
-  return { status: 'API Online', message: 'Filtros de segurança aplicados' };
-});
-
-// O SEGREDO PARA VERCEL: Exportar sem chamar o .listen()
+// IMPORTANTE: Na Vercel, exportamos o servidor para a plataforma gerenciar.
+// Remova qualquer linha que contenha "start()" ou "fastify.listen()".
 export default async (req, res) => {
   await fastify.ready();
   fastify.server.emit('request', req, res);
