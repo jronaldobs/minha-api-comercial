@@ -46,14 +46,8 @@ fastify.post('/produtos', async (request, reply) => {
 });
 
 // Inicialização
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000, host: '0.0.0.0' });
-    console.log('🚀 Server rodando em http://localhost:3000');
-    console.log('📖 Documentação em http://localhost:3000/docs');
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
+export default async (req, res) => {
+  await fastify.ready();
+  fastify.server.emit('request', req, res);
 };
 start();
